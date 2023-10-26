@@ -3,19 +3,24 @@
 __ram_size = 1;
 __STACKSIZE__ = 0x0080;
 STARTADDRESS  = 0x0200;
-__rc0 = 0xe0;
 
 
 INCLUDE imag-regs.ld
 
 MEMORY {
-    zp : ORIGIN = 0x00, LENGTH = 0xe0
     ram : ORIGIN = 0x0200, LENGTH = 0x1000 - 0x200
 }
 
 
-/*PROVIDE(irq = _irq_default);*/
-/*PROVIDE(nmi = _irq_default);*/
+__rc0 = 0x0002;
+INCLUDE imag-regs.ld
+ASSERT(__rc31 == 0x0021, "Inconsistent zero page map.")
+
+MEMORY { zp : ORIGIN = __rc31 + 1, LENGTH = 0x90 - (__rc31 + 1) }
+
+SECTIONS {
+    INCLUDE c.ld
+}
 
 
 REGION_ALIAS("c_readonly", ram)
@@ -24,7 +29,6 @@ REGION_ALIAS("c_writeable", ram)
 
 
 /*INCLUDE commodore.ld*/
-SECTIONS { INCLUDE c.ld }
 
 /* Grow stack downwards from end of RAM */
 __stack = (__ram_size * 1024);
@@ -32,6 +36,5 @@ __stack = (__ram_size * 1024);
 OUTPUT_FORMAT {
     /* Tells where to place the file's contents. */
     /*SHORT(nmi)*/
-    SHORT(ORIGIN(ram))
     TRIM(ram)
 }
