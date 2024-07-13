@@ -4,19 +4,20 @@ __ram_size = 1;
 __STACKSIZE__ = 0x0080;
 STARTADDRESS  = 0x0200;
 
-
-INCLUDE imag-regs.ld
+/*__basic_zp_start = 0x0002;
+__basic_zp_end = 0xe0;*/
 
 MEMORY {
-    ram : ORIGIN = 0x0200, LENGTH = 0x1000 - 0x200
+    zp : ORIGIN = 0x0000, LENGTH = 0xe0
+    ram (rw) : ORIGIN = 0x0200, LENGTH = 0x1000 - 0x200
+    vectors: ORIGIN = 0xFFFF - 6, LENGTH = 6
 }
 
-
-__rc0 = 0x0002;
+__rc0 = 0xe0;
 INCLUDE imag-regs.ld
-ASSERT(__rc31 == 0x0021, "Inconsistent zero page map.")
+ASSERT(__rc31 == 0xff, "Inconsistent zero page map.")
 
-MEMORY { zp : ORIGIN = __rc31 + 1, LENGTH = 0x90 - (__rc31 + 1) }
+
 
 SECTIONS {
     INCLUDE c.ld
@@ -34,7 +35,6 @@ REGION_ALIAS("c_writeable", ram)
 __stack = (__ram_size * 1024);
 
 OUTPUT_FORMAT {
-    /* Tells where to place the file's contents. */
-    /*SHORT(nmi)*/
     TRIM(ram)
+    FULL(vectors)
 }

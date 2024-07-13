@@ -24,9 +24,13 @@ install(FILES kim1.inc DESTINATION ${ASMINCDIR})
 add_platform_library(kim1-c
   #write.s
   #tapeio.s
-  scandisplay.c
+  #scandisplay.c
   #read.s
   #getkey.s
+  #reset.s
 )
 
 target_include_directories(kim1-c BEFORE PUBLIC .)
+
+add_platform_object_file(kim1-reset reset.o reset.s)
+
